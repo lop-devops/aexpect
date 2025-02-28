@@ -1220,6 +1220,7 @@ class ShellSession(Expect):
         self.sendline(cmd)
         try:
             out = self.read_up_to_prompt(timeout, internal_timeout, print_func)
+            out = astring.strip_console_codes(out)
         except ExpectTimeoutError as error:
             output = self.remove_command_echo(error.output, cmd)
             raise ShellTimeoutError(cmd, output) from error
@@ -1275,7 +1276,8 @@ class ShellSession(Expect):
             except ExpectError as error:
                 output = self.remove_command_echo(f"{out}{error.output}", cmd)
                 raise ShellError(cmd, output) from error
-
+        # Removing escape sequence
+        out = astring.strip_console_codes(out)
         if not success:
             raise ShellTimeoutError(cmd, out)
 
